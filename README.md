@@ -14,7 +14,7 @@ Simple Carousel
 
 ## Example markup
 
-```language-javascript
+```html
 <section class="carousel" data-module="Carousel" data-module-autoslide="4000">
   <div data-carousel-slides>
     <div data-carousel-slide></div>
