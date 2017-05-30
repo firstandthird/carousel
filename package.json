@@ -1,5 +1,5 @@
 {
-  "name": "carousel",
+  "name": "@firstandthird/carousel",
   "version": "1.0.0",
   "description": "Simple carousel",
   "main": "dist/carousel.js",
