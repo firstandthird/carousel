@@ -1,6 +1,6 @@
 {
   "name": "@firstandthird/carousel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple carousel",
   "main": "dist/carousel.js",
   "module": "index.js",
@@ -15,7 +15,9 @@
     "type": "git",
     "url": "git+https://github.com/firstandthird/carousel.git"
   },
-  "keywords": ["carousel"],
+  "keywords": [
+    "carousel"
+  ],
   "author": "First+Third <code@firstandthird.com> (http://firstandthird.com/)",
   "license": "MIT",
   "bugs": {
