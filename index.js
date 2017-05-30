@@ -15,7 +15,7 @@ const SELECTORS = {
   BUTTONS: '.carousel-control'
 };
 
-export default class Carousel extends Domodule {
+class Carousel extends Domodule {
   postInit() {
     this.currentPage = 0;
     this.moved = false;
