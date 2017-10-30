@@ -12,19 +12,29 @@ const CLASSES = {
 const SELECTORS = {
   SLIDES: '[data-carousel-slides]',
   SLIDE: '[data-carousel-slide]',
-  BUTTONS: '.carousel-control'
+  DOTS: '.carousel-control'
 };
 
 class Carousel extends Domodule {
+  get defaults() {
+    return {
+      transformsEnabled: false
+    };
+  }
+
   postInit() {
     this.currentPage = 0;
     this.moved = false;
-    this.isEnabled = isTouch();
+    this.isTouchEnabled = isTouch();
 
-    if (this.isEnabled &&
+    if (this.isTouchEnabled &&
         this.options.match &&
         !window.matchMedia(this.options.match).matches) {
-      this.isEnabled = false;
+      this.isTouchEnabled = false;
+    }
+
+    if (this.options.transformOn) {
+      this.options.transformsEnabled = window.matchMedia(this.options.transformOn).matches;
     }
 
     this.boundStart = this.onTouchStart.bind(this);
@@ -39,21 +49,20 @@ class Carousel extends Domodule {
     this.slidesContainers = slidesContainers
       .map(container => find(SELECTORS.SLIDE, container));
     this.slides = this.find(SELECTORS.SLIDE);
-    this.buttons = this.find(SELECTORS.BUTTONS);
-    this.maxPages = this.buttons.length;
+    this.dots = this.find(SELECTORS.DOTS);
+    this.maxPages = this.dots.length;
     this.paused = false;
+    this.prevButtons = this.find('[data-action="goPrev"]');
+    this.nextButtons = this.find('[data-action="goNext"]');
 
     // There aren't buttons
     if (!this.maxPages) {
       this.maxPages = this.slidesContainers[0].length;
-
-      // Updating ARIA on touch when no buttons
-      if (this.isEnabled) {
-        this.updateAria();
-      }
     }
 
-    on(window, 'resize', tinybounce(this.calcBounds.bind(this), 100));
+    this.updateAria();
+
+    on(window, 'resize', tinybounce(this.onResize.bind(this), 100));
     on(this.el, 'carousel:pause', () => {
       this.paused = true;
     });
@@ -63,7 +72,7 @@ class Carousel extends Domodule {
 
     this.calcBounds();
 
-    if (this.options.autoslide && !this.isEnabled) {
+    if (this.options.autoslide && !this.isTouchEnabled) {
       this.interval = parseInt(this.options.autoslide, 10);
 
       if (typeof this.interval === 'number' && !isNaN(this.interval)) {
@@ -138,6 +147,10 @@ class Carousel extends Domodule {
   }
 
   onTouchMove(event) {
+    if (!this.options.transformsEnabled) {
+      return;
+    }
+
     this.x = event.touches[0].pageX;
     const delta = (this.x - this.start);
     const amount = this.getTransformAmount() + (this.x - this.start);
@@ -194,17 +207,39 @@ class Carousel extends Domodule {
   }
 
   updateTransform() {
-    if (!this.isEnabled) {
+    if (!this.options.transformsEnabled) {
       return;
     }
 
-    const amount = this.getTransformAmount();
+    this.transformSlides();
+  }
 
+  transformSlides(amount = this.getTransformAmount()) {
     rAF(() => {
       this.slides.forEach(item => {
         item.style[TRANSFORM_PROPERTY] = `translate3d(${amount}px,0,0)`;
       });
     });
+  }
+
+  onResize() {
+    this.calcBounds();
+    let transformEnabled;
+
+    if (this.options.transformOn) {
+      transformEnabled = window.matchMedia(this.options.transformOn).matches;
+    }
+
+    if (transformEnabled !== this.options.transformsEnabled) {
+      // If it's not enabled anymore
+      if (this.options.transformsEnabled) {
+        this.transformSlides(0);
+      } else {
+        this.transformSlides();
+      }
+
+      this.options.transformsEnabled = transformEnabled;
+    }
   }
 
   calcBounds() {
@@ -214,7 +249,7 @@ class Carousel extends Domodule {
     let method;
 
     // Only for mobile
-    if (this.isEnabled) {
+    if (this.isTouchEnabled) {
       method = on;
     } else {
       method = off;
@@ -226,7 +261,7 @@ class Carousel extends Domodule {
   }
 
   updateAria() {
-    this.buttons.forEach((button, i) => {
+    this.dots.forEach((button, i) => {
       button.setAttribute('aria-selected', `${i === this.currentPage}`);
     });
 
@@ -236,6 +271,19 @@ class Carousel extends Domodule {
 
     this.getSlidesForI(this.currentPage).forEach((slide) => {
       slide.setAttribute('aria-hidden', 'false');
+    });
+
+    this.updateNextPrevButtons(this.nextButtons, this.currentPage >= (this.maxPages - 1));
+    this.updateNextPrevButtons(this.prevButtons, this.currentPage === 0);
+  }
+
+  updateNextPrevButtons(buttons, disable) {
+    buttons.forEach(button => {
+      if (button.tagName.toLowerCase() === 'button') {
+        button.disabled = disable;
+      } else {
+        button.setAttribute('aria-disabled', disable.toString());
+      }
     });
   }
 
