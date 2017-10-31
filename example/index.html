@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Carousel Examples</title>
+  <link rel="stylesheet" href="http://clientkit.io/clientkit.css">
+  <style>
+    .transform-carousel {
+      padding: 50px;
+      position: relative;
+    }
+
+    .transform-carousel [data-carousel-slides] {
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      height: 400px;
+    }
+
+    .transform-carousel .bg-image {
+      width: 100%;
+      flex-shrink: 0;
+      margin-right: 50px;
+      transition: transform 1s ease-in-out;
+    }
+
+    .transform-carousel .carousel-button {
+      background: red;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      color: white;
+      padding: 0;
+      position: absolute;
+      top: 50%;
+      z-index: 10;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+    }
+
+    .transform-carousel .carousel-button[disabled] {
+      cursor: not-allowed;
+      opacity: .3;
+    }
+
+    .transform-carousel .button-next {
+      right: 0;
+    }
+
+    .transform-carousel .button-prev {
+      left: 0;
+    }
+
+    .dragging [data-carousel-slide] {
+      transition: none;
+    }
+
+    .carousel-controls {
+      position: absolute;
+      bottom: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      left: 50%;
+      margin-left: -75px;
+    }
+
+    .carousel-controls li:not(:last-child) {
+      margin-right: 10px;
+    }
+
+    .carousel-control {
+      border-radius: 50%;
+      border: 2px solid rebeccapurple;
+      width: 30px;
+      height: 30px;
+      transition: background .3s ease;
+    }
+
+    .carousel-control[aria-selected=true],
+    .carousel-control[aria-selected=true]:hover {
+      background-color: rebeccapurple;
+    }
+
+    .carousel-control:hover {
+      cursor: pointer;
+      background-color: rgba(102, 51, 153, .3);
+    }
+
+    @media (min-width: 1025px) {
+      .opacity-carousel-desktop [data-carousel-slide] {
+        left: 0;
+        position: absolute;
+        top: 0;
+        height: 100%;
+        transition: opacity .5s ease;
+        margin-right: 0;
+        width: 100%;
+      }
+
+      .opacity-carousel-desktop [data-carousel-slide][aria-hidden=true] {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="heading-3 margin-bottom-xs">Dots Carousel</h2>
+    <p><strong>Features</strong></p>
+    <ul>
+      <li>Dot control</li>
+    </ul>
+    <div class="carousel transform-carousel" data-module="Carousel" data-module-transforms-enabled="true">
+      <ul class="carousel-controls">
+        <li><button class="carousel-control" data-action="changeSlide" data-action-index="1" aria-selected="true"></button></li>
+        <li><button class="carousel-control" data-action="changeSlide" data-action-index="2" aria-selected="false"></button></li>
+        <li><button class="carousel-control" data-action="changeSlide" data-action-index="3" aria-selected="false"></button></li>
+        <li><button class="carousel-control" data-action="changeSlide" data-action-index="4" aria-selected="false"></button></li>
+      </ul>
+
+      <div class="data-carousel-slides" data-carousel-slides>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=1)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=2)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=3)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=4)"></div>
+      </div>
+    </div>
+
+    <h2 class="heading-3 margin-bottom-xs">Simple Carousel</h2>
+    <p><strong>Features</strong></p>
+    <ul>
+      <li>Transforms always enabled</li>
+    </ul>
+    <div class="carousel transform-carousel" data-module="Carousel" data-module-transforms-enabled="true">
+      <button class="carousel-button button-prev" data-action="goPrev"><</button>
+      <button class="carousel-button button-next" data-action="goNext">></button>
+
+      <div class="data-carousel-slides" data-carousel-slides>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=1)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=2)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=3)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=4)"></div>
+      </div>
+    </div>
+
+    <h2 class="heading-3 margin-bottom-xs">Only tablet transform</h2>
+    <p><strong>Features</strong></p>
+    <ul>
+      <li>Transforms only enabled on below 1025px</li>
+      <li>Several slides</li>
+    </ul>
+    <div class="carousel transform-carousel opacity-carousel-desktop" data-module="Carousel" data-module-transform-on="(max-width: 1024px)">
+      <button class="carousel-button button-prev" data-action="goPrev"><</button>
+      <button class="carousel-button button-next" data-action="goNext">></button>
+
+      <div data-carousel-slides>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=1)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=2)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=3)"></div>
+        <div class="bg-image" data-carousel-slide style="background-image: url(https://source.unsplash.com/random?sig=4)"></div>
+      </div>
+
+      <div data-carousel-slides>
+        <div class="bg-image" data-carousel-slide>Some text 1</div>
+        <div class="bg-image" data-carousel-slide>Some text 2</div>
+        <div class="bg-image" data-carousel-slide>Some text 3</div>
+        <div class="bg-image" data-carousel-slide>Some text 4</div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <script src="../dist/carousel.js"></script>
+</body>
+</html>
