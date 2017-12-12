@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import Domodule from 'domodule';
 import { prefixedTransform, isTouch, on, off, hover, addClass, removeClass, find } from 'domassist';
 import tinybounce from 'tinybounce';
@@ -27,20 +28,98 @@ class Carousel extends Domodule {
     this.moved = false;
     this.isTouchEnabled = isTouch();
 
+    this.boundStart = this.onTouchStart.bind(this);
+    this.boundEnd = this.onTouchEnd.bind(this);
+    this.boundMove = this.onTouchMove.bind(this);
+
+    this.setReferences();
+    this.parseOptions();
+
+    on(window, 'resize', tinybounce(this.onResize.bind(this), 100));
+    on(this.el, 'carousel:pause', () => {
+      this.paused = true;
+    });
+    on(this.el, 'carousel:resume', () => {
+      this.paused = false;
+    });
+
+    this.updateAria();
+    this.calcBounds();
+  }
+
+  parseOptions() {
     if (this.isTouchEnabled &&
-        this.options.match &&
-        !window.matchMedia(this.options.match).matches) {
+      this.options.match &&
+      !window.matchMedia(this.options.match).matches) {
       this.isTouchEnabled = false;
+    }
+
+    if (this.options.transformsEnabled) {
+      this.options.transformsEnabled = this.options.transformsEnabled === 'true';
     }
 
     if (this.options.transformOn) {
       this.options.transformsEnabled = window.matchMedia(this.options.transformOn).matches;
     }
 
-    this.boundStart = this.onTouchStart.bind(this);
-    this.boundEnd = this.onTouchEnd.bind(this);
-    this.boundMove = this.onTouchMove.bind(this);
+    if (typeof this.options.responsive !== 'undefined') {
+      try {
+        this.options.responsive = JSON.parse(this.options.responsive.replace(/'/g, '"'));
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed to decode options.', this.options.responsive);
+        this.options.responsive = null;
+      }
+    }
 
+    this.slidesPerPages = 1;
+    this.updateSettings();
+
+    if (this.options.autoslide && !this.isTouchEnabled) {
+      setTimeout(this.startAutoSlide.bind(this), 0);
+    }
+  }
+
+  startAutoSlide() {
+    this.interval = parseInt(this.options.autoslide, 10);
+
+    if (typeof this.interval === 'number' && !isNaN(this.interval)) {
+      this.play();
+      hover(this.el, this.pause.bind(this), this.play.bind(this));
+    }
+  }
+
+  updateSettings() {
+    if (!this.options.responsive) {
+      return;
+    }
+
+    let setting = false;
+    const l = this.options.responsive.length;
+
+    for (let i = 0; i < l && !setting; i++) {
+      const option = this.options.responsive[i];
+
+      if (window.matchMedia(option.bp).matches) {
+        setting = option;
+      }
+    }
+
+    if (!setting) {
+      // eslint-disable-next-line no-console
+      console.warn('No match for responsive settings.');
+    }
+
+    this.maxPages = Math.ceil(this.slides.length / setting.slides);
+    this.slidesPerPages = setting.slides;
+
+    if (this.currentPage > this.maxPages) {
+      this.currentPage = this.maxPages - 1;
+      this.updateAria();
+    }
+  }
+
+  setReferences() {
     let slidesContainers = this.find(SELECTORS.SLIDES);
     if (!slidesContainers.length) {
       slidesContainers = [this.el];
@@ -58,27 +137,6 @@ class Carousel extends Domodule {
     // There aren't buttons
     if (!this.maxPages) {
       this.maxPages = this.slidesContainers[0].length;
-    }
-
-    this.updateAria();
-
-    on(window, 'resize', tinybounce(this.onResize.bind(this), 100));
-    on(this.el, 'carousel:pause', () => {
-      this.paused = true;
-    });
-    on(this.el, 'carousel:resume', () => {
-      this.paused = false;
-    });
-
-    this.calcBounds();
-
-    if (this.options.autoslide && !this.isTouchEnabled) {
-      this.interval = parseInt(this.options.autoslide, 10);
-
-      if (typeof this.interval === 'number' && !isNaN(this.interval)) {
-        this.play();
-        hover(this.el, this.pause.bind(this), this.play.bind(this));
-      }
     }
   }
 
@@ -109,7 +167,17 @@ class Carousel extends Domodule {
   }
 
   getSlidesForI(i) {
-    return this.slidesContainers.map(container => container[i]);
+    return [].concat.apply([], this.slidesContainers.map(container => {
+      const slides = [];
+      i = i * this.slidesPerPages;
+      const l = this.slidesPerPages;
+
+      for (let j = 0; j < l && container[i + j]; j++) {
+        slides.push(container[i + j]);
+      }
+
+      return slides;
+    }));
   }
 
   onTouchStart(event) {
@@ -196,11 +264,11 @@ class Carousel extends Domodule {
   }
 
   getTransformAmount() {
-    let amount = this.itemWidth * this.currentPage;
+    let amount = this.itemWidth * this.currentPage * this.slidesPerPages;
 
     if (amount) {
       amount *= -1;
-      amount -= this.currentPage * this.margin;
+      amount -= this.currentPage * this.margin * this.slidesPerPages;
     }
 
     return amount;
@@ -223,11 +291,14 @@ class Carousel extends Domodule {
   }
 
   onResize() {
+    this.updateSettings();
     this.calcBounds();
     let transformEnabled;
 
     if (this.options.transformOn) {
       transformEnabled = window.matchMedia(this.options.transformOn).matches;
+    } else {
+      transformEnabled = this.options.transformsEnabled;
     }
 
     if (transformEnabled !== this.options.transformsEnabled) {
@@ -239,13 +310,16 @@ class Carousel extends Domodule {
       }
 
       this.options.transformsEnabled = transformEnabled;
+    } else if (this.options.transformsEnabled) {
+      // Put the slides where they should be
+      this.transformSlides();
     }
   }
 
   calcBounds() {
     this.itemWidth = this.slides[0].offsetWidth;
     this.margin = parseInt(
-        window.getComputedStyle(this.slides[0]).marginRight, 10);
+      window.getComputedStyle(this.slides[0]).marginRight, 10);
     let method;
 
     // Only for mobile
@@ -301,5 +375,3 @@ class Carousel extends Domodule {
 }
 
 Domodule.register('Carousel', Carousel);
-
-export default Carousel;
