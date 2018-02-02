@@ -16,7 +16,7 @@ const SELECTORS = {
   DOTS: '.carousel-control'
 };
 
-class Carousel extends Domodule {
+export default class Carousel extends Domodule {
   get defaults() {
     return {
       transformsEnabled: false
