@@ -43,8 +43,13 @@ export default class Carousel extends Domodule {
       this.paused = false;
     });
 
-    this.updateAria();
-    this.calcBounds();
+    if (this.currentPage) {
+      this.calcBounds();
+      this.goToPage(this.currentPage);
+    } else {
+      this.updateAria();
+      this.calcBounds();
+    }
   }
 
   parseOptions() {
@@ -133,6 +138,12 @@ export default class Carousel extends Domodule {
     this.paused = false;
     this.prevButtons = this.find('[data-action="goPrev"]');
     this.nextButtons = this.find('[data-action="goNext"]');
+
+    this.slides.forEach((slide, i) => {
+      if (slide.getAttribute('aria-hidden') === 'false') {
+        this.currentPage = i;
+      }
+    });
 
     // There aren't buttons
     if (!this.maxPages) {

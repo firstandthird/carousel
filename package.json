@@ -26,8 +26,8 @@
   "homepage": "https://github.com/firstandthird/carousel#readme",
   "devDependencies": {
     "eslint-config-firstandthird": "4.3.0",
-    "eslint-plugin-import": "2.8.0",
-    "scriptkit": "0.3.0"
+    "eslint-plugin-import": "2.14.0",
+    "scriptkit": "1.0.0"
   },
   "scriptkit": {
     "test": {
