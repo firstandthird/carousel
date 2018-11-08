@@ -43,7 +43,7 @@ Simple Carousel
     <li><button class="carousel-control" data-action="changeSlide" data-action-index="3" aria-selected="false"></button></li>
     <li><button class="carousel-control" data-action="changeSlide" data-action-index="4" aria-selected="false"></button></li>
   </ul>
-</div>
+</section>
 ```
 
 There are more examples on the example folder.
