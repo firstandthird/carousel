@@ -1,6 +1,6 @@
 /* eslint-env browser */
 import Domodule from 'domodule';
-import { prefixedTransform, isTouch, on, off, hover, addClass, removeClass, find } from 'domassist';
+import { prefixedTransform, isTouch, on, off, hover, addClass, removeClass, find, fire } from 'domassist';
 import tinybounce from 'tinybounce';
 
 const TRANSFORM_PROPERTY = prefixedTransform();
@@ -17,6 +17,12 @@ const SELECTORS = {
 };
 
 export default class Carousel extends Domodule {
+  static get Events() {
+    return {
+      slideChange: 'carousel:slide:change'
+    };
+  }
+
   get defaults() {
     return {
       transformsEnabled: false
@@ -252,10 +258,19 @@ export default class Carousel extends Domodule {
   }
 
   goToPage(newPage) {
+    const oldPage = this.currentPage;
     this.currentPage = newPage;
 
     this.updateTransform();
     this.updateAria();
+
+    fire(this.el, Carousel.Events.slideChange, {
+      detail: {
+        module: this,
+        oldPage,
+        newPage
+      }
+    });
   }
 
   goPrev() {
