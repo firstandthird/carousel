@@ -204,7 +204,7 @@ export default class Carousel extends Domodule {
   }
 
   /**
-   * Cancel event if cancellable
+   * Cancel event if cancelable
    *
    * @param {Event} event
    */
