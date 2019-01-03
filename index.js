@@ -203,6 +203,17 @@ export default class Carousel extends Domodule {
     addClass(this.el, CLASSES.DRAG);
   }
 
+  /**
+   * Cancel event if cancellable
+   *
+   * @param {Event} event
+   */
+  preventEvent(event) {
+    if (event && event.cancelable) {
+      event.preventDefault();
+    }
+  }
+
   onTouchEnd(event) {
     if ((event.target && event.target.tagName === 'A') || this.paused) {
       // Preventing odd bug in which links are detected as swipes some times.
@@ -214,7 +225,7 @@ export default class Carousel extends Domodule {
     removeClass(this.el, CLASSES.DRAG);
 
     if (Math.abs(delta) >= limit) {
-      event.preventDefault();
+      this.preventEvent(event);
 
       if (delta < 0) {
         this.goNext();
@@ -223,7 +234,7 @@ export default class Carousel extends Domodule {
       }
     } else {
       if (this.moved) {
-        event.preventDefault();
+        this.preventEvent(event);
         this.goToPage(this.currentPage);
       }
     }
@@ -245,7 +256,7 @@ export default class Carousel extends Domodule {
       return;
     }
 
-    event.preventDefault();
+    this.preventEvent(event);
 
     if (amount > 30) {
       return;
@@ -388,7 +399,7 @@ export default class Carousel extends Domodule {
   }
 
   changeSlide(el, event, data) {
-    event.preventDefault();
+    this.preventEvent(event);
     const i = parseInt(data.index, 10) - 1;
     this.goToPage(i);
   }
