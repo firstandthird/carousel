@@ -79,4 +79,4 @@ A custom event `carousel:slide:change` is fired on every slide change.
 </section>
 ```
 
-There are more examples on the example folder.
+There are [more examples here](./example/index.html).
