@@ -1,20 +1,53 @@
 # Carousel
 
-Simple Carousel
+![npm](https://img.shields.io/npm/v/@firstandthird/carousel.svg)
+
+Simple Carousel.
+
+## Installation
+
+```sh
+npm install @firstandthird/carousel
+```
 
 ## Module Options
 
-* `autoslide`: Number of milliseconds to autoslide to next one.
-* `match`: Media query on which the carousel shouldn't work with touch events. Useful if you want to disable touch events on tablets.
-* `transformsEnabled`: By default, slides won't have a transform animation. If this is `true` they'll have a transform applied to them whenever the page is changed.
-* `transformOn`: This overwrites the above an only enables transform on a given media query.
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `autoslide` | _{Number}_ | `0` | Disabled by default. Number of milliseconds to autoslide to next one |
+| `match` | _{String}_ | - | Media query on which the carousel shouldn't work with touch events. Useful if you want to disable touch events on tablets |
+| `transformsEnabled` | _{Boolean}_ | `false` | By default, slides won't have a transform animation. If this is `true` they'll have a transform applied to them whenever the page is changed |
+| `transformOn` | _{String}_ | - | This overwrites the above an only enables transform on a given media query |
 
-## Actions
+## Methods
 
-* `changeSlide`: Navigates the carousel to a given slide. Needs parameter `index` (1 based)
-* `click`: Allows a slide to be linked to whatever the `data-href` value is.
-* `goPrev`: Allows an element (preferably a button) to go to the previous slide once clicked (if possible).
-* `goNext`: Allows an element (preferably a button) to go to the next slide once clicked (if possible).
+### play()
+
+Starts autosliding the carousel.
+
+### pause()
+
+Stops the carousel.
+
+### goToPage(index)
+
+Navigates the carousel to a given slide. Needs parameter `index` (1 based).
+
+#### Parameters
+
+`index` - _{Number}_ - Slide index
+
+### goPrev()
+
+Allows an element (preferably a button) to go to the previous slide once clicked (if possible).
+
+### goNext()
+
+Allows an element (preferably a button) to go to the next slide once clicked (if possible).
+
+## Events
+
+A custom event `carousel:slide:change` is fired on every slide change.
 
 ## Example markup
 
@@ -46,4 +79,4 @@ Simple Carousel
 </section>
 ```
 
-There are more examples on the example folder.
+There are [more examples here](./example/index.html).
