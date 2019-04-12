@@ -1,6 +1,6 @@
 {
   "name": "@firstandthird/carousel",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "Simple carousel",
   "main": "index.js",
   "module": "dist/carousel.esm.js",
