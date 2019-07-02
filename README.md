@@ -1,6 +1,4 @@
-# Carousel
-
-![npm](https://img.shields.io/npm/v/@firstandthird/carousel.svg)
+# Carousel ![npm](https://img.shields.io/npm/v/@firstandthird/carousel.svg)
 
 Simple Carousel.
 
